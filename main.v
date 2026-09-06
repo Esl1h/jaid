@@ -5,7 +5,9 @@ import redact
 
 fn main() {
 	mut unit := ''
-	mut since := '1h'
+	// journalctl's relative form needs the leading "-" (systemd.time(7)):
+	// a bare "1h" is rejected with "Failed to parse timestamp".
+	mut since := '-1h'
 	mut offline := false
 	mut show_payload := false
 	mut markdown := false
@@ -48,7 +50,7 @@ fn main() {
 	}
 
 	if unit == '' {
-		eprintln('usage: jaid --unit <name> [--since 1h] [--offline] [--show-payload] [--markdown]')
+		eprintln('usage: jaid --unit <name> [--since -1h] [--offline] [--show-payload] [--markdown]')
 		exit(1)
 	}
 
