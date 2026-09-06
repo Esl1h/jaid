@@ -55,6 +55,12 @@ see `toklen`/`llmbench` for why that doesn't change anything.
   `exec` returns a plain `Result`, not `!Result`, no `or {}` needed or
   accepted; check `res.exit_code` directly, including its own `-1`
   sentinel for "couldn't even start the process."
+- `journalctl --since` rejects a bare relative value (`1h`, `30m`) with
+  `Failed to parse timestamp`; systemd.time(7) needs the leading minus
+  (`-1h`) or the `1 hour ago` form. The default was `1h` for a while and
+  every default invocation exited 1. Any change to the default must be
+  run against the real `journalctl` (`jaid --unit <x> --offline`), not
+  just through `journalctl_args` tests, which only check the argv shape.
 - `journalctl` exits `0` and prints `-- No entries --` for a unit with
   nothing in the time window, including a unit that doesn't exist at
   all. An empty-looking journal is a normal result to report to the
@@ -65,6 +71,11 @@ see `toklen`/`llmbench` for why that doesn't change anything.
 
 ## Design decisions worth knowing before changing scope
 
+- **The journal window is capped (`--lines`, default 500, `journalctl -n`).**
+  Without it, a chatty unit over `--since` blew past Ollama's default
+  4096-token context, which truncates silently, so the model saw a random
+  prefix of the logs. The cap is the newest N entries, which is what a
+  triage wants.
 - **Redaction runs on the fully-assembled prompt (status + journal
   together), once, right before it's used.** Nothing downstream of
   `redact.apply()` in `main.v` ever touches the unredacted strings again
@@ -80,11 +91,11 @@ see `toklen`/`llmbench` for why that doesn't change anything.
   `Provider.complete()` call. This is a triage tool run interactively by
   a human, not a benchmark or a long-running service; `llmbench`'s
   streaming/retry complexity doesn't belong here without a real reason.
-- **MAC addresses pass through `redact` unmasked.** Confirmed against a
-  real `NetworkManager` log during testing. If this needs fixing, it
-  belongs in `redact`'s pattern list (a new `mac_address` `Pattern` in
-  its `patterns.v`), not a jaid-local workaround, `redact` is the
-  shared redaction module for a reason.
+- **Anything `redact` misses gets fixed in `redact`, never here.** MAC
+  addresses went to the model unmasked in the first live run against
+  `NetworkManager` (ten of them in one payload); the fix was a
+  `mac_address` rule in `redact`'s `patterns.v`, and jaid picked it up by
+  re-syncing `~/.vmodules/redact`. IPv6 and hostnames still pass through.
 
 ## Build and test
 
