@@ -1,0 +1,6 @@
+jaid
+*_test
+*.o
+*.tmp.c
+.*.v3cc.*/
+*.log
