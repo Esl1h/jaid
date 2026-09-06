@@ -8,6 +8,7 @@ fn main() {
 	// journalctl's relative form needs the leading "-" (systemd.time(7)):
 	// a bare "1h" is rejected with "Failed to parse timestamp".
 	mut since := '-1h'
+	mut lines := 500
 	mut offline := false
 	mut show_payload := false
 	mut markdown := false
@@ -32,6 +33,18 @@ fn main() {
 				}
 				since = os.args[i]
 			}
+			'--lines' {
+				i++
+				if i >= os.args.len {
+					eprintln('--lines needs a value')
+					exit(1)
+				}
+				lines = os.args[i].int()
+				if lines < 1 {
+					eprintln('--lines must be at least 1')
+					exit(1)
+				}
+			}
 			'--offline' {
 				offline = true
 			}
@@ -50,12 +63,12 @@ fn main() {
 	}
 
 	if unit == '' {
-		eprintln('usage: jaid --unit <name> [--since -1h] [--offline] [--show-payload] [--markdown]')
+		eprintln('usage: jaid --unit <name> [--since -1h] [--lines 500] [--offline] [--show-payload] [--markdown]')
 		exit(1)
 	}
 
 	status := collect_systemctl_status(unit)
-	journal := collect_journal(unit, since) or {
+	journal := collect_journal(unit, since, lines) or {
 		eprintln('error: ${err}')
 		exit(1)
 	}

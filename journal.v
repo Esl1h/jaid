@@ -6,8 +6,12 @@ import os
 // split from execution so the exact command stays testable without a
 // live systemd around. os.exec (not os.execute) runs it directly, no
 // shell, so nothing in `unit` or `since` is ever shell-interpreted.
-fn journalctl_args(unit string, since string) []string {
-	return ['journalctl', '-u', unit, '--since', since, '-o', 'short-iso', '--no-pager']
+// -n caps the window at the newest `lines` entries: a chatty unit over an
+// hour can exceed a local model's context (Ollama's default is 4096
+// tokens and it truncates silently) or an API's request limit.
+fn journalctl_args(unit string, since string, lines int) []string {
+	return ['journalctl', '-u', unit, '--since', since, '-n', '${lines}', '-o', 'short-iso',
+		'--no-pager']
 }
 
 fn systemctl_status_args(unit string) []string {
@@ -18,8 +22,8 @@ fn systemctl_status_args(unit string) []string {
 // and prints "-- No entries --" for a unit with nothing in the window
 // (even one that doesn't exist), so an empty-looking result is a normal
 // outcome to report, not a command failure.
-fn collect_journal(unit string, since string) !string {
-	res := os.exec(journalctl_args(unit, since))
+fn collect_journal(unit string, since string, lines int) !string {
+	res := os.exec(journalctl_args(unit, since, lines))
 	if res.exit_code != 0 {
 		return error('journalctl exited ${res.exit_code}: ${res.output}')
 	}
