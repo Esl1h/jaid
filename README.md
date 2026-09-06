@@ -2,7 +2,7 @@
 
 A [V](https://vlang.io) CLI: journalctl triage with an LLM. It collects a systemd unit's journal and status, redacts secrets locally before anything leaves the machine, sends the redacted text to an LLM, and prints back a diagnosis with suggested next steps. It never executes anything itself.
 
-Built on [`vai`](https://github.com/Esl1h/vai) (the LLM client) and [`redact`](https://github.com/Esl1h/redact) (the redaction pipeline) — this is mostly the glue between the two, plus `journalctl`/`systemctl`.
+Built on [`vai`](https://github.com/Esl1h/vai) (the LLM client) and [`redact`](https://github.com/Esl1h/redact) (the redaction pipeline), this is mostly the glue between the two, plus `journalctl`/`systemctl`.
 
 ## Install
 
@@ -30,9 +30,9 @@ Picks Anthropic (`claude-sonnet-5`, if `ANTHROPIC_API_KEY` is set) or the first 
 
 ## Why the redaction matters more than the prompt
 
-Without it, this is a wrapper around `curl`. `jaid` runs everything collected from `journalctl`/`systemctl` through [`redact`](https://github.com/Esl1h/redact) before it's sent anywhere: known secret formats (AWS keys, GitHub/Slack tokens, JWTs, Bearer headers) are masked by regex, IPv4 addresses are masked too — the run above shows a real IP turning into `<IPV4_1>` before the LLM ever sees it. `--show-payload` prints the exact redacted text that would be sent (or was sent), so nothing about what leaves the machine is a black box.
+Without it, this is a wrapper around `curl`. `jaid` runs everything collected from `journalctl`/`systemctl` through [`redact`](https://github.com/Esl1h/redact) before it's sent anywhere: known secret formats (AWS keys, GitHub/Slack tokens, JWTs, Bearer headers) are masked by regex, IPv4 addresses are masked too, the run above shows a real IP turning into `<IPV4_1>` before the LLM ever sees it. `--show-payload` prints the exact redacted text that would be sent (or was sent), so nothing about what leaves the machine is a black box.
 
-`jaid` never runs a command itself, only journalctl/systemctl in read-only modes to gather context, and suggests, in its output, what a human might run next — it does not run those either.
+`jaid` never runs a command itself, only journalctl/systemctl in read-only modes to gather context, and suggests, in its output, what a human might run next, it does not run those either.
 
 ## What's not covered yet
 
@@ -48,7 +48,7 @@ make test
 make fmt
 ```
 
-`v test .` can fail here with confusing `unknown type vai.anthropic.Provider` errors if a checkout of `vai` happens to sit next to this repo — a real, reproduced V compiler bug, not a code problem. See `toklen`'s AGENTS.md for the full diagnosis. `make build` plus a manual run is the reliable check.
+`v test .` can fail here with confusing `unknown type vai.anthropic.Provider` errors if a checkout of `vai` happens to sit next to this repo, a real, reproduced V compiler bug, not a code problem. See `toklen`'s AGENTS.md for the full diagnosis. `make build` plus a manual run is the reliable check.
 
 ## License
 
