@@ -1,12 +1,14 @@
 module main
 
 fn test_journalctl_args_shape() {
-	args := journalctl_args('nginx', '1h')
+	args := journalctl_args('nginx', '-1h', 500)
 	assert args[0] == 'journalctl'
 	assert '-u' in args
 	assert 'nginx' in args
 	assert '--since' in args
-	assert '1h' in args
+	assert '-1h' in args
+	assert '-n' in args
+	assert '500' in args
 	assert '--no-pager' in args
 }
 
@@ -14,9 +16,9 @@ fn test_journalctl_args_no_shell_metacharacters_needed() {
 	// os.exec takes argv directly, so a unit name or since value that
 	// would be dangerous to a shell (e.g. containing ";") just becomes
 	// one literal argument, never interpreted.
-	args := journalctl_args('nginx; rm -rf /', '1h')
+	args := journalctl_args('nginx; rm -rf /', '-1h', 500)
 	assert 'nginx; rm -rf /' in args
-	assert args.len == 7
+	assert args.len == 10
 }
 
 fn test_systemctl_status_args_shape() {
