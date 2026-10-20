@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  # Manual runs build the binaries without publishing, to check the matrix.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux-amd64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install V
+        run: |
+          git clone --depth 1 https://github.com/vlang/v "$HOME/v"
+          make -C "$HOME/v"
+          echo "$HOME/v" >> "$GITHUB_PATH"
+      - name: Install dependencies
+        run: |
+          v install https://github.com/Esl1h/vai
+          v install https://github.com/Esl1h/redact
+      - name: Build
+        run: v -prod -o jaid-${{ matrix.target }} .
+      - uses: actions/upload-artifact@v7
+        with:
+          name: jaid-${{ matrix.target }}
+          path: jaid-${{ matrix.target }}
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          merge-multiple: true
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --generate-notes jaid-*
