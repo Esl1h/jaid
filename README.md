@@ -8,6 +8,15 @@ Built on [`vai`](https://github.com/Esl1h/vai) (the LLM client) and [`redact`](h
 
 ## Install
 
+Prebuilt binaries for Linux (amd64) are attached to each [release](https://github.com/Esl1h/jaid/releases):
+
+```sh
+curl -fsSLo ~/.local/bin/jaid https://github.com/Esl1h/jaid/releases/latest/download/jaid-linux-amd64
+chmod +x ~/.local/bin/jaid
+```
+
+Or build from source:
+
 ```sh
 v install https://github.com/Esl1h/vai      # dependency
 v install https://github.com/Esl1h/redact   # dependency
