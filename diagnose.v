@@ -23,7 +23,7 @@ fn diagnose(prompt string) !string {
 			api_key: anthropic_key
 		}
 		resp := p.complete(vai.Request{
-			model:      'claude-sonnet-5'
+			model:      'claude-sonnet-5-5'
 			system:     system_prompt
 			messages:   [vai.user(prompt)]
 			max_tokens: 1024

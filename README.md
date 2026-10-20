@@ -42,7 +42,7 @@ jaid --unit nginx --since -1h --lines 2000      # keep more than the newest 500 
 
 `--lines` (default 500) is `journalctl -n`: the window is the newest N entries within `--since`. A chatty unit over an hour can otherwise exceed a local model's context (Ollama's default is 4096 tokens, and it truncates silently) or an API's request limit.
 
-Picks Anthropic (`claude-sonnet-5`, if `ANTHROPIC_API_KEY` is set) or the first Ollama model found locally, same provider selection as `toklen` and `llmbench`.
+Picks Anthropic (`claude-sonnet-5-5`, if `ANTHROPIC_API_KEY` is set) or the first Ollama model found locally, same provider selection as `toklen` and `llmbench`.
 
 ## Why the redaction matters more than the prompt
 
