@@ -23,9 +23,9 @@ fn diagnose(prompt string) !string {
 			api_key: anthropic_key
 		}
 		resp := p.complete(vai.Request{
-			model: 'claude-sonnet-5'
-			system: system_prompt
-			messages: [vai.user(prompt)]
+			model:      'claude-sonnet-5'
+			system:     system_prompt
+			messages:   [vai.user(prompt)]
 			max_tokens: 1024
 		})!
 		return extract_text(resp)
@@ -38,9 +38,9 @@ fn diagnose(prompt string) !string {
 		base_url: '${ollama_base}/v1'
 	}
 	resp := p.complete(vai.Request{
-		model: model
-		system: system_prompt
-		messages: [vai.user(prompt)]
+		model:      model
+		system:     system_prompt
+		messages:   [vai.user(prompt)]
 		max_tokens: 1024
 	})!
 	return extract_text(resp)
