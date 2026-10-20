@@ -1,5 +1,7 @@
 # jaid
 
+[![CI](https://github.com/Esl1h/jaid/actions/workflows/ci.yml/badge.svg)](https://github.com/Esl1h/jaid/actions/workflows/ci.yml)
+
 A [V](https://vlang.io) CLI: journalctl triage with an LLM. It collects a systemd unit's journal and status, redacts secrets locally before anything leaves the machine, sends the redacted text to an LLM, and prints back a diagnosis with suggested next steps. It never executes anything itself.
 
 Built on [`vai`](https://github.com/Esl1h/vai) (the LLM client) and [`redact`](https://github.com/Esl1h/redact) (the redaction pipeline), this is mostly the glue between the two, plus `journalctl`/`systemctl`.
